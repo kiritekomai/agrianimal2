@@ -8,6 +8,7 @@ import com.kiritekomai.agrianimal.Reference;
 import com.kiritekomai.agrianimal.entities.AgriFoxEntity;
 
 import net.minecraft.entity.EntityClassification;
+import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.item.Item;
@@ -15,7 +16,8 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
+import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -27,16 +29,18 @@ public class EntityRegistry {
     private static List<EntityType> entities = Lists.newArrayList();
     private static List<Item> spawnEggs = Lists.newArrayList();
 
-    public static final EntityType<AgriFoxEntity> AGRI_FOX = createEntity(AgriFoxEntity.class, AgriFoxEntity::new, 0.4F, 0.95F, 0x008000, 0xFF8000);
+    public static final EntityType<AgriFoxEntity> AGRI_FOX = createEntity(AgriFoxEntity.class, AgriFoxEntity::new, 0.4F, 0.95F, 0xFFFFFF, 0x000000);
 
     private static <T extends AnimalEntity> EntityType<T> createEntity(Class<T> entityClass, EntityType.IFactory<T> factory, float width, float height, int eggPrimary, int eggSecondary) {
         ResourceLocation location = new ResourceLocation(Reference.MOD_ID, classToString(entityClass));
         EntityType<T> entity = EntityType.Builder.create(factory, EntityClassification.CREATURE).size(width, height).setTrackingRange(64).setUpdateInterval(1).build(location.toString());
         entity.setRegistryName(location);
         entities.add(entity);
+
         Item spawnEgg = new SpawnEggItem(entity, eggPrimary, eggSecondary, (new Item.Properties()).group(ItemGroup.MISC));
         spawnEgg.setRegistryName(new ResourceLocation(Reference.MOD_ID, classToString(entityClass) + "_spawn_egg"));
         spawnEggs.add(spawnEgg);
+
         return entity;
     }
 
@@ -62,22 +66,15 @@ public class EntityRegistry {
     }
 
     public static void addSpawningConditions() {
-        //EntitySpawnPlacementRegistry.register(AGRI_FOX, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AgriFoxEntity::canSpawnHere);
+        EntitySpawnPlacementRegistry.register(AGRI_FOX, EntitySpawnPlacementRegistry.PlacementType.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AnimalEntity::canAnimalSpawn);
     }
 
     public static void addSpawns() {
-        addSpawn(AGRI_FOX, 2, 5, 5, BiomeDictionary.Type.PLAINS, BiomeDictionary.Type.FOREST);
-    }
 
-    public static void addSpawn(EntityType entityType, int min, int max, int weight, BiomeDictionary.Type... types) {
-        if (weight > 0) {
-            List<Biome> spawnableBiomes = Lists.newArrayList();
-            for (BiomeDictionary.Type type : types) {
-                spawnableBiomes.addAll(BiomeDictionary.getBiomes(type));
-            }
-            for (Biome biome : spawnableBiomes) {
-                biome.getSpawns(entityType.getClassification()).add(new Biome.SpawnListEntry(entityType, weight, min, max));
-            }
+    	Biome []spawnbiome = {Biomes.TAIGA, Biomes.TAIGA_HILLS, Biomes.TAIGA_MOUNTAINS, Biomes.GIANT_TREE_TAIGA, Biomes.GIANT_SPRUCE_TAIGA, Biomes.GIANT_TREE_TAIGA_HILLS, Biomes.GIANT_SPRUCE_TAIGA_HILLS,
+		  Biomes.SNOWY_TAIGA, Biomes.SNOWY_TAIGA_HILLS, Biomes.SNOWY_TAIGA_MOUNTAINS};
+    	for (Biome biome : spawnbiome) {
+            biome.getSpawns(AGRI_FOX.getClassification()).add(new Biome.SpawnListEntry(AGRI_FOX, 2, 4, 8));
         }
     }
 }

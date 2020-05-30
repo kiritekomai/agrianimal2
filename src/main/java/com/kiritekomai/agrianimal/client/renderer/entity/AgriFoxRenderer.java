@@ -16,33 +16,51 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class AgriFoxRenderer extends MobRenderer<AgriFoxEntity, AgriFoxModel<AgriFoxEntity>> {
-   private static final ResourceLocation FOX = new ResourceLocation(Reference.MOD_ID,"textures/entity/agri_fox/agri_fox.png");
-   private static final ResourceLocation SLEEPING_FOX = new ResourceLocation(Reference.MOD_ID,"textures/entity/agri_fox/agri_fox_sleep.png");
-   private static final ResourceLocation SNOW_FOX = new ResourceLocation(Reference.MOD_ID,"textures/entity/agri_fox/snow_agri_fox.png");
-   private static final ResourceLocation SLEEPING_SNOW_FOX = new ResourceLocation(Reference.MOD_ID,"textures/entity/agri_fox/snow_agri_fox_sleep.png");
+	private static final ResourceLocation FOX = new ResourceLocation(Reference.MOD_ID,"textures/entity/agri_fox/agri_fox.png");
+	private static final ResourceLocation WORKING_FOX = new ResourceLocation(Reference.MOD_ID,"textures/entity/agri_fox/agri_fox_work.png");
+	private static final ResourceLocation SLEEPING_FOX = new ResourceLocation(Reference.MOD_ID,"textures/entity/agri_fox/agri_fox_sleep.png");
+	private static final ResourceLocation SNOW_FOX = new ResourceLocation(Reference.MOD_ID,"textures/entity/agri_fox/snow_agri_fox.png");
+	private static final ResourceLocation WORKING_SNOW_FOX = new ResourceLocation(Reference.MOD_ID,"textures/entity/agri_fox/snow_agri_fox_work.png");
+	private static final ResourceLocation SLEEPING_SNOW_FOX = new ResourceLocation(Reference.MOD_ID,"textures/entity/agri_fox/snow_agri_fox_sleep.png");
 
-   public AgriFoxRenderer(EntityRendererManager renderManagerIn) {
-      super(renderManagerIn, new AgriFoxModel<>(), 0.4F);
-      this.addLayer(new AgriFoxHeldItemLayer(this));
-   }
+	public AgriFoxRenderer(EntityRendererManager renderManagerIn) {
+		super(renderManagerIn, new AgriFoxModel<>(), 0.4F);
+		this.addLayer(new AgriFoxHeldItemLayer(this));
+	}
 
-   protected void applyRotations(AgriFoxEntity entityLiving, MatrixStack matrixStackIn, float ageInTicks, float rotationYaw, float partialTicks) {
-      super.applyRotations(entityLiving, matrixStackIn, ageInTicks, rotationYaw, partialTicks);
-      if (entityLiving.func_213480_dY() || entityLiving.isStuck()) {
-         float f = -MathHelper.lerp(partialTicks, entityLiving.prevRotationPitch, entityLiving.rotationPitch);
-         matrixStackIn.rotate(Vector3f.XP.rotationDegrees(f));
-      }
+	protected void applyRotations(AgriFoxEntity entityLiving, MatrixStack matrixStackIn, float ageInTicks, float rotationYaw, float partialTicks) {
+		super.applyRotations(entityLiving, matrixStackIn, ageInTicks, rotationYaw, partialTicks);
+		if (entityLiving.func_213480_dY() || entityLiving.isStuck()) {
+			float f = -MathHelper.lerp(partialTicks, entityLiving.prevRotationPitch, entityLiving.rotationPitch);
+			matrixStackIn.rotate(Vector3f.XP.rotationDegrees(f));
+		}
 
-   }
+	}
 
-   /**
-    * Returns the location of an entity's texture.
-    */
-   public ResourceLocation getEntityTexture(AgriFoxEntity entity) {
-      if (entity.getVariantType() == AgriFoxEntity.Type.RED) {
-         return entity.isSleeping() ? SLEEPING_FOX : FOX;
-      } else {
-         return entity.isSleeping() ? SLEEPING_SNOW_FOX : SNOW_FOX;
-      }
-   }
+	/**
+	 * Returns the location of an entity's texture.
+	 */
+	public ResourceLocation getEntityTexture(AgriFoxEntity entity) {
+		if (entity.getVariantType() == AgriFoxEntity.Type.RED) {
+			if( entity.isHarvesting()) {
+				return WORKING_FOX;
+			}
+			else if( entity.isSleeping()) {
+				return SLEEPING_FOX;
+			}
+			else {
+				return FOX;
+			}
+		} else {
+			if( entity.isHarvesting()) {
+				return WORKING_SNOW_FOX;
+			}
+			else if( entity.isSleeping()) {
+				return SLEEPING_SNOW_FOX;
+			}
+			else {
+				return SNOW_FOX;
+			}
+		}
+	}
 }

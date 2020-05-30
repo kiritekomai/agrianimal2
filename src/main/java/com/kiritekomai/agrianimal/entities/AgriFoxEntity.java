@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
+import com.kiritekomai.agrianimal.entities.ai.goal.MyFollowOwnerGoal;
 import com.kiritekomai.agrianimal.entities.ai.goal.MyHarvestFarmland;
 import com.kiritekomai.agrianimal.entities.ai.goal.MyPickupItemGoal;
 import com.kiritekomai.agrianimal.entities.ai.goal.MyPutItemGoal;
@@ -144,6 +145,7 @@ public class AgriFoxEntity extends AgrianimalEntity{
 		this.goalSelector.addGoal(4, new MyHarvestFarmland(this,1.0D));
 		this.goalSelector.addGoal(4, new MyPickupItemGoal(this,1.0D));
 
+	    this.goalSelector.addGoal(6, new MyFollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, false));
 		this.goalSelector.addGoal(5, new AgriFoxEntity.FollowTargetGoal());
 		this.goalSelector.addGoal(6, new AgriFoxEntity.PounceGoal());
 		this.goalSelector.addGoal(6, new AgriFoxEntity.FindShelterGoal(1.25D));

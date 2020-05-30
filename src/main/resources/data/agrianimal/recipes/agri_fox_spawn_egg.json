@@ -1,0 +1,41 @@
+{
+	"type": "crafting_shaped",
+	"pattern": [
+		"#BM",
+		"EDR",
+		"WPC"
+	],
+	"key": {
+		"#": {
+			"item": "minecraft:sweet_berries"
+		},
+		"B": {
+			"item": "minecraft:rabbit"
+		},
+		"M": {
+			"item": "minecraft:chicken"
+		},
+		"E": {
+			"item": "minecraft:emerald_block"
+		},
+		"D": {
+			"item": "minecraft:diamond_block"
+		},
+		"R": {
+			"item": "minecraft:redstone_block"
+		},
+		"W": {
+			"item": "minecraft:wheat"
+		},
+		"P": {
+			"item": "minecraft:potato"
+		},
+		"C": {
+			"item": "minecraft:carrot"
+		}
+	},
+	"result": {
+		"item": "agrianimal:agri_fox_spawn_egg",
+		"count": 1
+	}
+}
