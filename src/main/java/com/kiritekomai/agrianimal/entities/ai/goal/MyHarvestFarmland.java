@@ -12,6 +12,7 @@ import net.minecraft.block.StemGrownBlock;
 import net.minecraft.block.SugarCaneBlock;
 import net.minecraft.entity.ai.goal.MoveToBlockGoal;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.BlockNamedItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.pathfinding.GroundPathNavigator;
@@ -93,15 +94,11 @@ public class MyHarvestFarmland extends MoveToBlockGoal {
 						} else if (itemstack.getItem() == Items.BEETROOT_SEEDS) {
 							iworld.setBlockState(blockpos, Blocks.BEETROOTS.getDefaultState(), 3);
 							flag = true;
-						} else if (itemstack.getItem() instanceof net.minecraftforge.common.IPlantable) {
-							if (((net.minecraftforge.common.IPlantable) itemstack.getItem()).getPlantType(iworld,
-									blockpos) == net.minecraftforge.common.PlantType.Crop) {
-								iworld.setBlockState(blockpos,
-										((net.minecraftforge.common.IPlantable) itemstack.getItem()).getPlant(iworld,
-												blockpos),
-										3);
-								flag = true;
-							}
+						} else if (this.agriAnimal.isFarmableItem(itemstack.getItem())) {
+							iworld.setBlockState(blockpos,
+									((CropsBlock)((BlockNamedItem)(itemstack.getItem())).getBlock()).getDefaultState(),
+									3);
+							flag = true;
 						}
 					}
 
