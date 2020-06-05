@@ -4,10 +4,12 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
+import net.minecraft.block.CropsBlock;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.BlockNamedItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -130,7 +132,8 @@ public abstract class AgrianimalEntity extends TameableEntity{
 	}
 
 	public boolean isFarmableItem(Item itemIn) {
-		return FARMABLE_ITEMS.contains(itemIn);
+		return itemIn instanceof BlockNamedItem && ((BlockNamedItem)itemIn).getBlock() instanceof CropsBlock;
+//				FARMABLE_ITEMS.contains(itemIn);
 	}
 
 	public boolean isPickupItem(Item itemIn) {
@@ -155,5 +158,18 @@ public abstract class AgrianimalEntity extends TameableEntity{
 	public void onDeath(DamageSource cause) {
 		this.dropInventoryItems();
 		super.onDeath(cause);
+	}
+
+	public void livingTick() {
+		this.world.getProfiler().startSection("looting");
+		if (!this.world.isRemote && this.canPickUpLoot() && this.isAlive() && !this.dead && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this)) {
+			for(ItemEntity itementity : this.world.getEntitiesWithinAABB(ItemEntity.class, this.getBoundingBox().grow(1.5D, 1.5D, 1.5D))) {
+				if (!itementity.removed && !itementity.getItem().isEmpty() && !itementity.cannotPickup()) {
+					this.updateEquipmentIfNeeded(itementity);
+				}
+			}
+		}
+		this.world.getProfiler().endSection();
+		super.livingTick();
 	}
 }
