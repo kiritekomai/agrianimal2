@@ -147,7 +147,7 @@ public class MyPutItemGoal  extends Goal{
 			}
 			if (!list.isEmpty()) {
 				//select a nearest position
-				BlockPos blockpos = this.agriAnimal.getPosition();
+				BlockPos blockpos = new BlockPos(this.agriAnimal.getPositionVec());
 				Collections.sort(list, new Comparator<BlockPos>() {
 					@Override
 					public int compare(BlockPos obj1, BlockPos obj2) {

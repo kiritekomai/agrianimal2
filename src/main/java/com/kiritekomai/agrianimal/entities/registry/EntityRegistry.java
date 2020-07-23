@@ -10,6 +10,7 @@ import com.kiritekomai.agrianimal.entities.AgriFoxEntity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -76,5 +77,8 @@ public class EntityRegistry {
     	for (Biome biome : spawnbiome) {
             biome.getSpawns(AGRI_FOX.getClassification()).add(new Biome.SpawnListEntry(AGRI_FOX, 2, 4, 8));
         }
+    }
+    public static void registerAttributes() {
+        GlobalEntityTypeAttributes.put(AGRI_FOX, AgriFoxEntity.getAttributes().func_233813_a_());
     }
 }

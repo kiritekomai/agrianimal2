@@ -35,6 +35,7 @@ public class Agrianimal
 
     private void setup(final FMLCommonSetupEvent event)
     {
+        EntityRegistry.registerAttributes();
         EntityRegistry.addSpawningConditions();
         DeferredWorkQueue.runLater(EntityRegistry::addSpawns);
     }
