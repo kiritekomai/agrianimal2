@@ -4,6 +4,7 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
+import com.kiritekomai.agrianimal.Reference;
 import net.minecraft.block.CropsBlock;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
@@ -21,7 +22,12 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
+@Mod.EventBusSubscriber(modid = Reference.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public abstract class AgrianimalEntity extends TameableEntity{
 	private static final Set<Item> FARMABLE_ITEMS = ImmutableSet.of(Items.POTATO, Items.CARROT, Items.WHEAT_SEEDS, Items.BEETROOT_SEEDS);
 	private static final DataParameter<Boolean> HAEVESTING = EntityDataManager.createKey(AgrianimalEntity.class,DataSerializers.BOOLEAN);
@@ -171,5 +177,15 @@ public abstract class AgrianimalEntity extends TameableEntity{
 		}
 		this.world.getProfiler().endSection();
 		super.livingTick();
+	}
+
+	@SubscribeEvent
+	public static void onLivingAttack(LivingAttackEvent event) {
+		if (!event.getEntity().getEntityWorld().isRemote
+				&& event.getEntityLiving() instanceof AgrianimalEntity
+				&& ((AgrianimalEntity)event.getEntityLiving()).isHarvesting()
+				&&  ( event.getSource() == DamageSource.SWEET_BERRY_BUSH || event.getSource() == DamageSource.IN_WALL)) {
+			event.setCanceled(true);
+		}
 	}
 }

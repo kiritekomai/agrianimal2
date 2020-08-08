@@ -1,21 +1,17 @@
 package com.kiritekomai.agrianimal.entities.ai.goal;
 
+import com.kiritekomai.agrianimal.entities.AgriFoxEntity;
 import com.kiritekomai.agrianimal.entities.AgrianimalEntity;
 
-import net.minecraft.block.AttachedStemBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CropsBlock;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.StemGrownBlock;
-import net.minecraft.block.SugarCaneBlock;
+import net.minecraft.block.*;
 import net.minecraft.entity.ai.goal.MoveToBlockGoal;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.BlockNamedItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.pathfinding.GroundPathNavigator;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
@@ -75,7 +71,9 @@ public class MyHarvestFarmland extends MoveToBlockGoal {
 				iworld.destroyBlock(getStemGlownBlockPos(iworld, blockpos), true);
 			} else if (this.currentTask == 0 && getReedBlockPos(iworld, blockpos) != null) {
 				iworld.destroyBlock(getReedBlockPos(iworld, blockpos), true);
-			} else if (this.currentTask == 1 && iblockstate.isAir()) {
+			}else if(this.currentTask == 0 && getSweetBerryBushBlockPos(iworld, blockpos) != null) {
+				harvestSweetBerry(iworld,blockpos,iblockstate);
+			}else if (this.currentTask == 1 && iblockstate.isAir()) {
 				Inventory myinventory = this.agriAnimal.getInventory();
 
 				for (int i = 0; i < myinventory.getSizeInventory(); ++i) {
@@ -155,6 +153,12 @@ public class MyHarvestFarmland extends MoveToBlockGoal {
 			shouldGo = true;
 
 		}
+		if (!shouldGo && (getSweetBerryBushBlockPos(worldIn, pos) != null)
+				&& (this.currentTask == 0 || this.currentTask < 0)) {
+			task = 0;
+			shouldGo = true;
+
+		}
 		GroundPathNavigator path_finder = new GroundPathNavigator(this.agriAnimal,this.agriAnimal.world);
 
 		if (shouldGo) {
@@ -194,4 +198,21 @@ public class MyHarvestFarmland extends MoveToBlockGoal {
 		}
 		return null;
 	}
+
+	protected BlockPos getSweetBerryBushBlockPos(IWorldReader worldIn, BlockPos pos) {
+		BlockState blockstate = worldIn.getBlockState(pos);
+		if( blockstate.isIn(Blocks.SWEET_BERRY_BUSH) && blockstate.get(SweetBerryBushBlock.AGE) >= 2 ){
+			return pos;
+		}
+		return null;
+	}
+	protected void harvestSweetBerry( World world, BlockPos pos,BlockState blockstate) {
+			int i = blockstate.get(SweetBerryBushBlock.AGE);
+			blockstate.with(SweetBerryBushBlock.AGE, Integer.valueOf(1));
+			int j = 1 + world.rand.nextInt(2) + (i == 3 ? 1 : 0);
+			Block.spawnAsEntity(world, pos, new ItemStack(Items.SWEET_BERRIES, j));
+
+			this.agriAnimal.playSound(SoundEvents.ITEM_SWEET_BERRIES_PICK_FROM_BUSH, 1.0F, 1.0F);
+			world.setBlockState(pos, blockstate.with(SweetBerryBushBlock.AGE, Integer.valueOf(1)), 2);
+		}
 }
