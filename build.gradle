@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '0.3'
+version = '0.4'
 group = 'com.kiritekomai.agrianimal' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'agrianimal-1.16.1'
 
@@ -118,7 +118,7 @@ jar {
         attributes([
             "Specification-Title": "agrianimal",
             "Specification-Vendor": "kiritekomai",
-            "Specification-Version": "0.3", // We are version 1 of ourselves
+            "Specification-Version": "0.4", // We are version 1 of ourselves
             "Implementation-Title": project.name,
             "Implementation-Version": "${version}",
             "Implementation-Vendor" :"kiritekomai",
