@@ -122,6 +122,15 @@ public abstract class AgrianimalEntity extends TameableEntity{
 		return false;
 	}
 
+	public boolean hasItem(Item itemIn){
+		for (int i = 0; i < this.myInventory.getSizeInventory(); ++i) {
+			if (this.myInventory.getStackInSlot(i).getItem() == itemIn) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	protected void updateEquipmentIfNeeded(ItemEntity itemEntity) {
 		ItemStack itemstack = itemEntity.getItem();
