@@ -1,4 +1,5 @@
 package com.kiritekomai.agrianimal.entities.registry;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.base.CaseFormat;
@@ -15,11 +16,15 @@ import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.SpawnEggItem;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.BiomeLoadingEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -54,7 +59,6 @@ public class EntityRegistry {
         for (EntityType entity : entities) {
             Preconditions.checkNotNull(entity.getRegistryName(), "registryName");
             event.getRegistry().register(entity);
-            //EntitySpawnPlacementRegistry.register(entity, EntitySpawnPlacementRegistry.PlacementType.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AnimalEntity::canAnimalSpawn);
         }
     }
 
@@ -70,14 +74,6 @@ public class EntityRegistry {
         EntitySpawnPlacementRegistry.register(AGRI_FOX, EntitySpawnPlacementRegistry.PlacementType.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AnimalEntity::canAnimalSpawn);
     }
 
-    public static void addSpawns() {
-
-    	Biome []spawnbiome = {Biomes.TAIGA, Biomes.TAIGA_HILLS, Biomes.TAIGA_MOUNTAINS, Biomes.GIANT_TREE_TAIGA, Biomes.GIANT_SPRUCE_TAIGA, Biomes.GIANT_TREE_TAIGA_HILLS, Biomes.GIANT_SPRUCE_TAIGA_HILLS,
-		  Biomes.SNOWY_TAIGA, Biomes.SNOWY_TAIGA_HILLS, Biomes.SNOWY_TAIGA_MOUNTAINS};
-    	for (Biome biome : spawnbiome) {
-            biome.getSpawns(AGRI_FOX.getClassification()).add(new Biome.SpawnListEntry(AGRI_FOX, 2, 4, 8));
-        }
-    }
     public static void registerAttributes() {
         GlobalEntityTypeAttributes.put(AGRI_FOX, AgriFoxEntity.getAttributes().func_233813_a_());
     }

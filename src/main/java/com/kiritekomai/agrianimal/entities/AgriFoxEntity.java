@@ -53,6 +53,7 @@ import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.passive.ChickenEntity;
+import net.minecraft.entity.passive.FoxEntity;
 import net.minecraft.entity.passive.RabbitEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -72,20 +73,11 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityPredicates;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.server.ServerWorld;
@@ -313,15 +305,14 @@ public class AgriFoxEntity extends AgrianimalEntity{
 	public static AttributeModifierMap.MutableAttribute func_234192_eI_() {
 		return MobEntity.func_233666_p_().func_233815_a_(Attributes.field_233821_d_, (double)0.3F).func_233815_a_(Attributes.field_233818_a_, 10.0D).func_233815_a_(Attributes.field_233819_b_, 32.0D).func_233815_a_(Attributes.field_233823_f_, 2.0D);
 	}
-
-	public AgriFoxEntity createChild(AgeableEntity ageable) {
-		AgriFoxEntity AgriFoxEntity = EntityRegistry.AGRI_FOX.create(this.world);
+	public AgriFoxEntity func_241840_a(ServerWorld p_241840_1_, AgeableEntity ageable) {
+		AgriFoxEntity AgriFoxEntity = EntityRegistry.AGRI_FOX.create(p_241840_1_);
 		AgriFoxEntity.setVariantType(this.rand.nextBoolean() ? this.getVariantType() : ((AgriFoxEntity)ageable).getVariantType());
 		return AgriFoxEntity;
 	}
 
 	@Nullable
-	public ILivingEntityData onInitialSpawn(IWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
+	public ILivingEntityData onInitialSpawn(IServerWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
 		Biome biome = worldIn.getBiome(this.func_233580_cy_());
 		AgriFoxEntity.Type AgriFoxEntity$type = AgriFoxEntity.Type.getTypeByBiome(biome);
 		boolean flag = false;
@@ -1028,7 +1019,7 @@ public class AgriFoxEntity extends AgrianimalEntity{
 		public final AgriFoxEntity.Type field_220366_a;
 
 		public FoxData(AgriFoxEntity.Type p_i50734_1_) {
-			this.func_226259_a_(false);
+			super(false);
 			this.field_220366_a = p_i50734_1_;
 		}
 	}
@@ -1115,7 +1106,8 @@ public class AgriFoxEntity extends AgrianimalEntity{
 		 * Spawns a baby animal of the same type.
 		 */
 		protected void spawnBaby() {
-			AgriFoxEntity AgriFoxEntity = (AgriFoxEntity)this.animal.createChild(this.targetMate);
+			ServerWorld serverworld = (ServerWorld)this.world;
+			AgriFoxEntity AgriFoxEntity = (AgriFoxEntity)this.animal.func_241840_a(serverworld,this.targetMate);
 			if (AgriFoxEntity != null) {
 				ServerPlayerEntity serverplayerentity = this.animal.getLoveCause();
 				ServerPlayerEntity serverplayerentity1 = this.targetMate.getLoveCause();
@@ -1510,6 +1502,7 @@ public class AgriFoxEntity extends AgrianimalEntity{
 		RED(0, "red", Biomes.TAIGA, Biomes.TAIGA_HILLS, Biomes.TAIGA_MOUNTAINS, Biomes.GIANT_TREE_TAIGA, Biomes.GIANT_SPRUCE_TAIGA, Biomes.GIANT_TREE_TAIGA_HILLS, Biomes.GIANT_SPRUCE_TAIGA_HILLS),
 		SNOW(1, "snow", Biomes.SNOWY_TAIGA, Biomes.SNOWY_TAIGA_HILLS, Biomes.SNOWY_TAIGA_MOUNTAINS);
 
+
 		private static final AgriFoxEntity.Type[] field_221088_c = Arrays.stream(values()).sorted(Comparator.comparingInt(AgriFoxEntity.Type::getIndex)).toArray((p_221084_0_) -> {
 			return new AgriFoxEntity.Type[p_221084_0_];
 		});
@@ -1518,9 +1511,9 @@ public class AgriFoxEntity extends AgrianimalEntity{
 		}));
 		private final int index;
 		private final String name;
-		private final List<Biome> spawnBiomes;
+		private final List<RegistryKey<Biome>> spawnBiomes;
 
-		private Type(int indexIn, String nameIn, Biome... spawnBiomesIn) {
+		private Type(int indexIn, String nameIn, RegistryKey<Biome>... spawnBiomesIn) {
 			this.index = indexIn;
 			this.name = nameIn;
 			this.spawnBiomes = Arrays.asList(spawnBiomesIn);
@@ -1530,7 +1523,7 @@ public class AgriFoxEntity extends AgrianimalEntity{
 			return this.name;
 		}
 
-		public List<Biome> getSpawnBiomes() {
+		public List<RegistryKey<Biome>> getSpawnBiomes() {
 			return this.spawnBiomes;
 		}
 
