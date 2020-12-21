@@ -19,16 +19,18 @@ public class EntityBiomeRegistry {
         String currentBiome = event.getName().toString();
 
         String[] spawnbiome = {
-                Biomes.TAIGA.func_240901_a_().toString(),
-                Biomes.TAIGA_HILLS.func_240901_a_().toString(),
-                Biomes.TAIGA_MOUNTAINS.func_240901_a_().toString(),
-                Biomes.GIANT_TREE_TAIGA.func_240901_a_().toString(),
-                Biomes.GIANT_SPRUCE_TAIGA.func_240901_a_().toString(),
-                Biomes.GIANT_TREE_TAIGA_HILLS.func_240901_a_().toString(),
-                Biomes.GIANT_SPRUCE_TAIGA_HILLS.func_240901_a_().toString(),
-                Biomes.SNOWY_TAIGA.func_240901_a_().toString(),
-                Biomes.SNOWY_TAIGA_HILLS.func_240901_a_().toString(),
-                Biomes.SNOWY_TAIGA_MOUNTAINS.func_240901_a_().toString()
+                Biomes.TAIGA.getLocation().toString(),
+                Biomes.TAIGA_HILLS.getLocation().toString(),
+                Biomes.TAIGA_MOUNTAINS.getLocation().toString(),
+                Biomes.GIANT_TREE_TAIGA.getLocation().toString(),
+                Biomes.GIANT_SPRUCE_TAIGA.getLocation().toString(),
+                Biomes.GIANT_TREE_TAIGA_HILLS.getLocation().toString(),
+                Biomes.GIANT_SPRUCE_TAIGA_HILLS.getLocation().toString(),
+                Biomes.SNOWY_TAIGA.getLocation().toString(),
+                Biomes.SNOWY_TAIGA_HILLS.getLocation().toString(),
+                Biomes.SNOWY_TAIGA_MOUNTAINS.getLocation().toString(),
+                //Biomes.PLAINS.getLocation().toString(),   //for debug
+                //Biomes.DESERT.getLocation().toString()    //for debug
         };
         if (Arrays.asList(spawnbiome).contains(currentBiome)) {
 

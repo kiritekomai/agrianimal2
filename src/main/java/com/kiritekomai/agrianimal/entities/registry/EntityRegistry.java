@@ -75,6 +75,6 @@ public class EntityRegistry {
     }
 
     public static void registerAttributes() {
-        GlobalEntityTypeAttributes.put(AGRI_FOX, AgriFoxEntity.getAttributes().func_233813_a_());
+        GlobalEntityTypeAttributes.put(AGRI_FOX, AgriFoxEntity.getAttributes().create());
     }
 }

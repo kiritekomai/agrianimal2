@@ -154,8 +154,8 @@ public class AgriFoxEntity extends AgrianimalEntity{
 		this.goalSelector.addGoal(11, new AgriFoxEntity.FindItemsGoal());
 		this.goalSelector.addGoal(12, new AgriFoxEntity.WatchGoal(this, PlayerEntity.class, 24.0F));
 		this.goalSelector.addGoal(13, new AgriFoxEntity.SitAndLookGoal());
-		this.targetSelector.addGoal(3, new AgriFoxEntity.RevengeGoal(LivingEntity.class, false, false, (p_213493_1_) -> {
-			return STALKABLE_PREY.test(p_213493_1_) && !this.isTrustedUUID(p_213493_1_.getUniqueID());
+		this.targetSelector.addGoal(3, new AgriFoxEntity.RevengeGoal(LivingEntity.class, false, false, (p_234193_1_) -> {
+			return STALKABLE_PREY.test(p_234193_1_) && !this.isTrustedUUID(p_234193_1_.getUniqueID());
 		}));
 	}
 
@@ -209,7 +209,7 @@ public class AgriFoxEntity extends AgrianimalEntity{
 	 * Dead and sleeping entities cannot move
 	 */
 	protected boolean isMovementBlocked() {
-		return this.func_233643_dh_();
+		return this.getShouldBeDead();
 	}
 
 	private boolean canEatItem(ItemStack itemStackIn) {
@@ -289,8 +289,8 @@ public class AgriFoxEntity extends AgrianimalEntity{
 			ItemStack itemstack = this.getItemStackFromSlot(EquipmentSlotType.MAINHAND);
 			if (!itemstack.isEmpty()) {
 				for(int i = 0; i < 8; ++i) {
-					Vector3d vec3d = (new Vector3d(((double)this.rand.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, 0.0D)).rotatePitch(-this.rotationPitch * ((float)Math.PI / 180F)).rotateYaw(-this.rotationYaw * ((float)Math.PI / 180F));
-					this.world.addParticle(new ItemParticleData(ParticleTypes.ITEM, itemstack), this.getPosX() + this.getLookVec().x / 2.0D, this.getPosY(), this.getPosZ() + this.getLookVec().z / 2.0D, vec3d.x, vec3d.y + 0.05D, vec3d.z);
+					Vector3d vector3d = (new Vector3d(((double)this.rand.nextFloat() - 0.5D) * 0.1D, Math.random() * 0.1D + 0.1D, 0.0D)).rotatePitch(-this.rotationPitch * ((float)Math.PI / 180F)).rotateYaw(-this.rotationYaw * ((float)Math.PI / 180F));
+					this.world.addParticle(new ItemParticleData(ParticleTypes.ITEM, itemstack), this.getPosX() + this.getLookVec().x / 2.0D, this.getPosY(), this.getPosZ() + this.getLookVec().z / 2.0D, vector3d.x, vector3d.y + 0.05D, vector3d.z);
 				}
 			}
 		} else {
@@ -303,7 +303,7 @@ public class AgriFoxEntity extends AgrianimalEntity{
 		return func_234192_eI_();
 	}
 	public static AttributeModifierMap.MutableAttribute func_234192_eI_() {
-		return MobEntity.func_233666_p_().func_233815_a_(Attributes.field_233821_d_, (double)0.3F).func_233815_a_(Attributes.field_233818_a_, 10.0D).func_233815_a_(Attributes.field_233819_b_, 32.0D).func_233815_a_(Attributes.field_233823_f_, 2.0D);
+		return MobEntity.func_233666_p_().createMutableAttribute(Attributes.MOVEMENT_SPEED, (double)0.3F).createMutableAttribute(Attributes.MAX_HEALTH, 10.0D).createMutableAttribute(Attributes.FOLLOW_RANGE, 32.0D).createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0D);
 	}
 	public AgriFoxEntity func_241840_a(ServerWorld p_241840_1_, AgeableEntity ageable) {
 		AgriFoxEntity AgriFoxEntity = EntityRegistry.AGRI_FOX.create(p_241840_1_);
@@ -313,12 +313,12 @@ public class AgriFoxEntity extends AgrianimalEntity{
 
 	@Nullable
 	public ILivingEntityData onInitialSpawn(IServerWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
-		Biome biome = worldIn.getBiome(this.func_233580_cy_());
+		Biome biome = worldIn.getBiome(this.getPosition());
 		AgriFoxEntity.Type AgriFoxEntity$type = AgriFoxEntity.Type.getTypeByBiome(biome);
 		boolean flag = false;
 		if (spawnDataIn instanceof AgriFoxEntity.FoxData) {
 			AgriFoxEntity$type = ((AgriFoxEntity.FoxData)spawnDataIn).field_220366_a;
-			if (((AgriFoxEntity.FoxData)spawnDataIn).func_226257_a_() >= 2) {
+			if (((AgriFoxEntity.FoxData)spawnDataIn).getIndexInGroup() >= 2) {
 				flag = true;
 			}
 		} else {
@@ -438,7 +438,7 @@ public class AgriFoxEntity extends AgrianimalEntity{
 		return this.getFoxFlag(32);
 	}
 
-	private void setSleeping(boolean p_213485_1_) {
+	public void setSleeping(boolean p_213485_1_) {
 		this.setFoxFlag(32, p_213485_1_);
 	}
 
@@ -501,7 +501,7 @@ public class AgriFoxEntity extends AgrianimalEntity{
 			}
 
 			if (this.isStuck() && this.world.rand.nextFloat() < 0.2F) {
-				BlockPos blockpos = this.func_233580_cy_();
+				BlockPos blockpos = this.getPosition();
 				BlockState blockstate = this.world.getBlockState(blockpos);
 				this.world.playEvent(2001, blockpos, Block.getStateId(blockstate));
 			}
@@ -587,8 +587,8 @@ public class AgriFoxEntity extends AgrianimalEntity{
 		super.setAttackTarget(entitylivingbaseIn);
 	}
 
-	protected int calculateFallDamage(float p_225508_1_, float p_225508_2_) {
-		return MathHelper.ceil((p_225508_1_ - 5.0F) * p_225508_2_);
+	protected int calculateFallDamage(float distance, float damageMultiplier) {
+		return MathHelper.ceil((distance - 5.0F) * damageMultiplier);
 	}
 
 	private void func_213454_em() {
@@ -906,8 +906,8 @@ public class AgriFoxEntity extends AgrianimalEntity{
 					return false;
 				} else {
 					this.cooldown = 100;
-					BlockPos blockpos = this.creature.func_233580_cy_();
-					return AgriFoxEntity.this.world.isDaytime() && AgriFoxEntity.this.world.canSeeSky(blockpos) && !((ServerWorld)AgriFoxEntity.this.world).isVillage(blockpos) && this.func_220702_g();
+					BlockPos blockpos = this.creature.getPosition();
+					return AgriFoxEntity.this.world.isDaytime() && AgriFoxEntity.this.world.canSeeSky(blockpos) && !((ServerWorld)AgriFoxEntity.this.world).isVillage(blockpos) && this.isPossibleShelter();
 				}
 			} else {
 				return false;
@@ -1083,7 +1083,7 @@ public class AgriFoxEntity extends AgrianimalEntity{
 
 		}
 
-		protected boolean func_220680_b() {
+		protected boolean shouldResetPitch() {
 			return !AgriFoxEntity.this.func_213480_dY() && !AgriFoxEntity.this.isCrouching() && !AgriFoxEntity.this.func_213467_eg() & !AgriFoxEntity.this.isStuck();
 		}
 	}
@@ -1108,6 +1108,9 @@ public class AgriFoxEntity extends AgrianimalEntity{
 		protected void spawnBaby() {
 			ServerWorld serverworld = (ServerWorld)this.world;
 			AgriFoxEntity AgriFoxEntity = (AgriFoxEntity)this.animal.func_241840_a(serverworld,this.targetMate);
+			final net.minecraftforge.event.entity.living.BabyEntitySpawnEvent event = new net.minecraftforge.event.entity.living.BabyEntitySpawnEvent(animal, targetMate, AgriFoxEntity);
+			final boolean cancelled = net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
+			AgriFoxEntity = (AgriFoxEntity) event.getChild();
 			if (AgriFoxEntity != null) {
 				ServerPlayerEntity serverplayerentity = this.animal.getLoveCause();
 				ServerPlayerEntity serverplayerentity1 = this.targetMate.getLoveCause();
@@ -1133,7 +1136,7 @@ public class AgriFoxEntity extends AgrianimalEntity{
 				this.targetMate.resetInLove();
 				AgriFoxEntity.setGrowingAge(-24000);
 				AgriFoxEntity.setLocationAndAngles(this.animal.getPosX(), this.animal.getPosY(), this.animal.getPosZ(), 0.0F, 0.0F);
-				this.world.addEntity(AgriFoxEntity);
+				serverworld.func_242417_l(AgriFoxEntity);
 				this.world.setEntityState(this.animal, (byte)18);
 				if (this.world.getGameRules().getBoolean(GameRules.DO_MOB_LOOT)) {
 					this.world.addEntity(new ExperienceOrbEntity(this.world, this.animal.getPosX(), this.animal.getPosY(), this.animal.getPosZ(), this.animal.getRNG().nextInt(7) + 1));
@@ -1225,8 +1228,8 @@ public class AgriFoxEntity extends AgrianimalEntity{
 			AgriFoxEntity.this.func_213502_u(false);
 			LivingEntity livingentity = AgriFoxEntity.this.getAttackTarget();
 			AgriFoxEntity.this.getLookController().setLookPositionWithEntity(livingentity, 60.0F, 30.0F);
-			Vector3d vec3d = (new Vector3d(livingentity.getPosX() - AgriFoxEntity.this.getPosX(), livingentity.getPosY() - AgriFoxEntity.this.getPosY(), livingentity.getPosZ() - AgriFoxEntity.this.getPosZ())).normalize();
-			AgriFoxEntity.this.setMotion(AgriFoxEntity.this.getMotion().add(vec3d.x * 0.8D, 0.9D, vec3d.z * 0.8D));
+			Vector3d vector3d = (new Vector3d(livingentity.getPosX() - AgriFoxEntity.this.getPosX(), livingentity.getPosY() - AgriFoxEntity.this.getPosY(), livingentity.getPosZ() - AgriFoxEntity.this.getPosZ())).normalize();
+			AgriFoxEntity.this.setMotion(AgriFoxEntity.this.getMotion().add(vector3d.x * 0.8D, 0.9D, vector3d.z * 0.8D));
 			AgriFoxEntity.this.getNavigator().clearPath();
 		}
 
@@ -1251,19 +1254,19 @@ public class AgriFoxEntity extends AgrianimalEntity{
 			}
 
 			if (!AgriFoxEntity.this.isStuck()) {
-				Vector3d vec3d = AgriFoxEntity.this.getMotion();
-				if (vec3d.y * vec3d.y < (double)0.03F && AgriFoxEntity.this.rotationPitch != 0.0F) {
+				Vector3d vector3d = AgriFoxEntity.this.getMotion();
+				if (vector3d.y * vector3d.y < (double)0.03F && AgriFoxEntity.this.rotationPitch != 0.0F) {
 					AgriFoxEntity.this.rotationPitch = MathHelper.rotLerp(AgriFoxEntity.this.rotationPitch, 0.0F, 0.2F);
 				} else {
-					double d0 = Math.sqrt(Entity.horizontalMag(vec3d));
-					double d1 = Math.signum(-vec3d.y) * Math.acos(d0 / vec3d.length()) * (double)(180F / (float)Math.PI);
+					double d0 = Math.sqrt(Entity.horizontalMag(vector3d));
+					double d1 = Math.signum(-vector3d.y) * Math.acos(d0 / vector3d.length()) * (double)(180F / (float)Math.PI);
 					AgriFoxEntity.this.rotationPitch = (float)d1;
 				}
 			}
 
 			if (livingentity != null && AgriFoxEntity.this.getDistance(livingentity) <= 2.0F) {
 				AgriFoxEntity.this.attackEntityAsMob(livingentity);
-			} else if (AgriFoxEntity.this.rotationPitch > 0.0F && AgriFoxEntity.this.onGround && (float)AgriFoxEntity.this.getMotion().y != 0.0F && AgriFoxEntity.this.world.getBlockState(AgriFoxEntity.this.func_233580_cy_()).isIn(Blocks.SNOW)) {
+			} else if (AgriFoxEntity.this.rotationPitch > 0.0F && AgriFoxEntity.this.onGround && (float)AgriFoxEntity.this.getMotion().y != 0.0F && AgriFoxEntity.this.world.getBlockState(AgriFoxEntity.this.getPosition()).isIn(Blocks.SNOW)) {
 				AgriFoxEntity.this.rotationPitch = 60.0F;
 				AgriFoxEntity.this.setAttackTarget((LivingEntity)null);
 				AgriFoxEntity.this.setStuck(true);
@@ -1310,7 +1313,7 @@ public class AgriFoxEntity extends AgrianimalEntity{
 		 * Execute a one shot task or start executing a continuous task
 		 */
 		public void startExecuting() {
-			this.func_234054_a_(this.field_220786_j);
+			this.setNearestTarget(this.field_220786_j);
 			this.nearestTarget = this.field_220786_j;
 			if (this.field_220787_k != null) {
 				this.field_220788_l = this.field_220787_k.getRevengeTimer();
